@@ -19,7 +19,7 @@ def RemoveFolders():
 		folder = os.path.abspath(folder)
 		if os.path.isdir(folder):
 			try:
-				shutil.rmtree(folder)
+				shutil.rmtree(folder, ignore_errors=True)
 			except ValueError:
 				print("Could not delete folder :"+folder)
 
