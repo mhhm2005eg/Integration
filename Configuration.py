@@ -16,8 +16,9 @@ ChangePackageList={"MFC400":"209686:2","SRLCam":"203064:1"}
 CMPList = ["SAC_StereoAutoCalibration", "FSD_FreeSpaceDetection"]
 #####################################################
 ListOfProjects = ["MFC400", "SRLCam"]
-PrjOfDevPath = {"MFC4T0_B1_01.01":"MFC400","MFC4T0_B2_01.02":"MFC400","SRLCam4T0_R2.0.0_INT1":"SRLCam","SRLCam4T0_2.1":"SRLCam","SRLCam4T0_2.2":"SRLCam",}
+PrjOfDevPath = {"SMFC4B0_07.00.00":"MFC400","MFC4T0_B2_01.02":"MFC400","SRLCam4T0_R2.0.0_INT1":"SRLCam","SRLCam4T0_2.1":"SRLCam","SRLCam4T0_2.2":"SRLCam",}
 MainProjectName=PrjOfDevPath[DevPath]
+MainProjectName="MFC400"
 ChangePackage=ChangePackageList[MainProjectName]
 
 class SubProject:
@@ -79,8 +80,12 @@ def ReadXml(XmlFileName, tag):
 		#dump(subPro)
 		
 	return SubPros
-
-def GetRevisionForLabel(RootProject, SharedProject, Label):
+def ConvertFlatToConfigPath(Sub):
+	t = Sub.replace("/project.pj","")
+	y = t.replace(MainProjectName+"/", "PROJECTS.pj#"+MainProjectName+"#d="+DevPath+"#")
+	return y
+	
+def GetRevisionForLabel(DevPath, SharedProject, Label):
 		"""
 		GetRevisionForLabel( SharedProject, Label)
 
@@ -92,11 +97,16 @@ def GetRevisionForLabel(RootProject, SharedProject, Label):
 		return 0 if label could not be found in this shared project
 		"""
 		ret_value = "default"
-		cmdline_info='si viewprojecthistory --batch  --fields=labels,revision --rfilter=labeled --project='+SharedProject
-#		print SharedProject
+		if DevPath:
+			cmdline_info='si viewprojecthistory --batch  --fields=labels,revision --rfilter=labeled ' +' -P  #p='+ConvertFlatToConfigPath(SharedProject)+''
+		else:
+			cmdline_info='si viewprojecthistory --batch  --fields=labels,revision --rfilter=labeled   --project='+SharedProject
+		print cmdline_info
 		try:
 			proc=subprocess.Popen(cmdline_info, shell=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 			stdout_str, stderr_str = proc.communicate()
+			#print(stdout_str)
+			#print(stderr_str)
 			stdout_str_lines = stdout_str.splitlines()
 		except OSError,ValueError:
 			print formatExceptionInfo()
@@ -120,7 +130,7 @@ def GetRevisionForLabel(RootProject, SharedProject, Label):
 						try:
 							argu[0].decode('ascii')
 						except UnicodeDecodeError:
-							Common.Tell("Decoding issue")
+							print("Decoding issue")
 				else:
 					# an ascii-encoded unicode string
 					#print(argu[0],1)
@@ -129,6 +139,9 @@ def GetRevisionForLabel(RootProject, SharedProject, Label):
 						#print(cmdline_info)
 						break
 #						print "Return value " + ret_value
+		if ret_value == "default":
+			print(stdout_str)
+			print(stderr_str)
 		return ret_value
 def ConfigCompList():
 	for folder in BasicDestinationSubProjectList:
@@ -187,7 +200,7 @@ def ParsConfFiles():
 		tree = ET.parse(File)
 		root = tree.getroot()
 		Base = root.find("BaseConfig")
-		if Base:
+		if not Base is None:
 			for Cfg in Base.findall("SharedProject"):
 				subPro = SubProject(xx)
 				xx=xx+1
@@ -195,9 +208,13 @@ def ParsConfFiles():
 				subPro.New_label.append(Cfg.find('Config').get('Label'))
 				subPro.cmp = Cfg.get('CompName')
 				SubPros.append(copy.deepcopy(subPro))
+				if subPro.cmp == MainProjectName:
+					global DevPath 
+					DevPath= Cfg.find('Config').get('DevPathName')
+					print("wdcw"+ DevPath)
 		Custom = root.find("CustomConfigV2")
 		
-		if Custom:
+		if not Custom is None:
 			for Cfg in Custom.findall("SharedProject"):
 				subPro = SubProject(xx)
 				xx=xx+1
@@ -232,11 +249,30 @@ def Test():
 	#ret = ReadIni("Conf.ini")
 	#print(ret)
 
+def reportLabelsDiff(Objs):
+	ret = 0
+	for Obj in Objs:
+		if Obj.Typ == "build":
+			for x in Obj.New_label:
+				if Obj.label == x:
+					ret = 1
+					break
+			if ret == 1:
+				#print Obj.path+ "  is OK !!!"
+				ret = 0
+			else:
+				print Obj.path+ "  Error !!! Label "+Obj.label+" does not exist !!!" 
+
+
 def main():
 	ret1 = ReadXml(LatestFolderStrutureFile, "SharedProjectConfig")
 	ret2 =  ParsConfFiles()
 	ret = OrListOfObj(ret1, ret2)
+	reportLabelsDiff(ret)
 	for x in ret:
+		print("#"*30)
+		if x.Typ == "build":
+			print(GetRevisionForLabel("DevPath", x.path,x.label))
 		dump(x)
 main()
 #Test()
