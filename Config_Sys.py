@@ -23,7 +23,7 @@ CurrentSandBox = Sandbox
 MainProjectName  ="MFC400"
 DevPath  = "SMFC4B0_07.00.00"
 
-ChangePackageList={"MFC400":"241130:1","SRLCam":"203064:1"}
+ChangePackageList={"MFC400":"263205:1","SRLCam":"203064:1"}
 
 
 ListOfProjects = ["MFC400", "SRLCam"]
@@ -33,7 +33,7 @@ ChangePackage=ChangePackageList[MainProjectName]
 
 
 
-RFoldersToConfig = ["../02_System/05_Tools/mts_system/mts_measurement/cfg/algo","../02_System/05_Tools/mts_system/mts_measurement/dll/algo","../02_System/05_Tools/mts_system/mts_measurement/sdl/algo"]
+RFoldersToConfig = ["../02_System/05_Tools/mts_system/mts_measurement/cfg/algo","../02_System/05_Tools/mts_system/mts_measurement/dll/algo","../02_System/05_Tools/mts_system/mts_measurement/sdl/algo","../02_System/05_Tools/mts_system/mts_measurement/sdl/ti_c674x/","../02_System/05_Tools/mts_system/mts_measurement/sdl/ti_cortex_a8/"]
 AFoldersToConfig = []
 ASubsToConfig = []
 
@@ -269,7 +269,10 @@ def main():
 	GetSandBoxinfo()
 	L = CurrentSandBox.LatestLabel
 	if Auto != "STD_ON":
-		L = getLabel()	
+		L = getLabel()
+	print("#"*30)
+	print("Label to be configured : "+L)
+	print("#"*30)
 	ConvertALL()
 	ConfigALL(L)
 	

@@ -7,12 +7,17 @@ from os.path import basename , dirname
 #import CppHeaderParser
 import shutil
 import datetime
-
-
+import info
+CP = "263205:1"
+AUTO_CP = "STD_ON"
+if AUTO_CP == "STD_ON":
+	CP = info.MyInfo.cp
 
 def Configure():
 	Build_Command = "run_config.cmd "
 	proc=subprocess.Popen(Build_Command, shell=False,stdin=subprocess.PIPE,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	print("CP used is : "+CP)
+	proc.stdin.write(CP+"\n")
 	proc.stdin.write("2\n")
 	proc.stdin.write("y\n")
 	while True:

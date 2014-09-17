@@ -26,12 +26,13 @@ class SubProject:
 		self.ID = ID
 		self.path=""
 		self.cmp=""
-		self.label=""
-		self.New_label=[]
+		self.label=""		
 		self.Cp=""
 		#self.Rev=""
 		self.Typ=""
-		
+	class Config:
+		New_label=[]
+
 SubProjectList=[]
 
 def dump(obj):
@@ -42,7 +43,9 @@ def dump(obj):
                print("-"*30)
                print( "obj.%s = %s" % (attr, getattr(obj, attr)))
                print("-"*30)
-
+   subs = obj.__subclasses__()
+   #for cls in vars()['obj'].subclasses():
+       #dump(cls)
 		   
 def ReadIni(IniFileName):
 	returnValue = {}
@@ -205,7 +208,7 @@ def ParsConfFiles():
 				subPro = SubProject(xx)
 				xx=xx+1
 				subPro.Typ = Cfg.find('Config').get('Type')
-				subPro.New_label.append(Cfg.find('Config').get('Label'))
+				subPro.Config.New_label.append(Cfg.find('Config').get('Label'))
 				subPro.cmp = Cfg.get('CompName')
 				SubPros.append(copy.deepcopy(subPro))
 				if subPro.cmp == MainProjectName:
@@ -222,7 +225,7 @@ def ParsConfFiles():
 				subPro.cmp = Cfg.get('CompName')
 				for x in SubPros:
 					if x.cmp == subPro.cmp:
-						x.New_label.append( Cfg.find('Config').get('Label'))
+						x.Config.New_label.append( Cfg.find('Config').get('Label'))
 						
 	return(SubPros)
 		
@@ -253,7 +256,7 @@ def reportLabelsDiff(Objs):
 	ret = 0
 	for Obj in Objs:
 		if Obj.Typ == "build":
-			for x in Obj.New_label:
+			for x in Obj.Config.New_label:
 				if Obj.label == x:
 					ret = 1
 					break

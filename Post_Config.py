@@ -12,7 +12,7 @@ FoldersToSynch = [".\\04_Engineering\\01_Source_Code\\", ".\\04_Engineering\\03_
 ScriptsToInvoke = [".\\04_Engineering\\03_Workspace\\algo\\make_all_ecu.cmd",".\\04_Engineering\\03_Workspace\\algo\\make_all_sim.cmd",".\\04_Engineering\\03_Workspace\\algo\\make_all_vis.cmd"]
 FilesNotToSynch = [".\\04_Engineering\\03_Workspace\\algo\\make_all.xml"]
 FoldersToBeRemoved = [".\\04_Engineering\\04_Build\\algo"]
-CLEAN = "STD_OFF"
+CLEAN = "STD_ON"
 
 def RemoveFolders():
 	for folder in FoldersToBeRemoved:

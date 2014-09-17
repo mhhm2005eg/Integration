@@ -27,10 +27,11 @@ lst.sort()
 if lst:
 	fo.write("#"*30+" \n")
 	fo.write("#"*30+" \n")
+	print("Info. : Labels Modified are : "+str(len(lst))+ " Ones")
 	print("Labels Updated as below ... ")
 	for i in lst:
-		fo.write(i)
-		print(i) 
+		fo.write(str(lst.index(i))+" :"+i)
+		print(str(lst.index(i))+" :"+i) 
 	fo.write("#"*30+" \n")
 	fo.write("#"*30+" \n")
 else:
