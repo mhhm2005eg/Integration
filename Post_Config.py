@@ -7,12 +7,21 @@ from os.path import basename , dirname
 #import CppHeaderParser
 import shutil
 import datetime
+import info
 
 FoldersToSynch = [".\\04_Engineering\\01_Source_Code\\", ".\\04_Engineering\\03_Workspace\\", ".\\04_Engineering\\\\05_Deliverables\\",]
 ScriptsToInvoke = [".\\04_Engineering\\03_Workspace\\algo\\make_all_ecu.cmd",".\\04_Engineering\\03_Workspace\\algo\\make_all_sim.cmd",".\\04_Engineering\\03_Workspace\\algo\\make_all_vis.cmd"]
 FilesNotToSynch = [".\\04_Engineering\\03_Workspace\\algo\\make_all.xml"]
 FoldersToBeRemoved = [".\\04_Engineering\\04_Build\\algo"]
-CLEAN = "STD_ON"
+
+CLEAN = info.MyConf.CLEAN
+Rebuild = info.MyConf.Rebuild
+Build_Options=info.MyConf.Extra_Build_Options
+if Rebuild == "STD_ON":
+	Build_Options =Build_Options+ " -r "
+
+WD =os.path.abspath(info.MyConf.WD)
+os.chdir(WD) 
 
 def RemoveFolders():
 	for folder in FoldersToBeRemoved:
@@ -64,7 +73,7 @@ def SynchAll():
 	for folder in FoldersToSynch:
 		folder = os.path.abspath(folder)
 		folder = folder + "/project.pj"
-		Build_Command = "si resync --overwriteChanged "+folder
+		Build_Command = "si resync --overwriteChanged -R "+folder
 		Kprint("Synch Project : "+ folder+" ...")
 		proc=subprocess.Popen(Build_Command, shell=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		stdout_str, stderr_str = proc.communicate()
@@ -78,8 +87,8 @@ def SynchAll():
 def BuildAll():
 	for Script in ScriptsToInvoke:
 		Script = os.path.abspath(Script)
-		Build_Command = Script + "  "
-		Kprint("Building  : "+ Script+" ...")
+		Build_Command = Script+"  " + Build_Options +"  "
+		Kprint("Building  : "+ Script+Build_Options +" ...")
 		BaseFolder = os.path.dirname(Script)
 		abspath = os.path.abspath(__file__)
 		dname = os.path.dirname(abspath)

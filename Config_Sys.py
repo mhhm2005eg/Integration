@@ -7,8 +7,16 @@ from os.path import basename , dirname
 #import CppHeaderParser
 import shutil
 import datetime
+import re
+import info
 
-Auto = "STD_ON"
+Auto_Sys_Config = info.MyConf.Auto_Sys_Config
+
+AUTO_CP = info.MyConf.AUTO_CP
+
+WD =os.path.abspath(info.MyConf.WD)
+os.chdir(WD) 
+	
 class Sandbox:
 	def __init__(self):
 		self.DevPath = ""
@@ -31,17 +39,28 @@ PrjOfDevPath = {"SMFC4B0_07.00.00":"MFC400","MFC4T0_B2_01.02":"MFC400","SRLCam4T
 MainProjectName=PrjOfDevPath[DevPath]
 ChangePackage=ChangePackageList[MainProjectName]
 
-
+if AUTO_CP == "STD_ON":
+	ChangePackage = info.MyInfo.cp
 
 RFoldersToConfig = ["../02_System/05_Tools/mts_system/mts_measurement/cfg/algo","../02_System/05_Tools/mts_system/mts_measurement/dll/algo","../02_System/05_Tools/mts_system/mts_measurement/sdl/algo","../02_System/05_Tools/mts_system/mts_measurement/sdl/ti_c674x/","../02_System/05_Tools/mts_system/mts_measurement/sdl/ti_cortex_a8/"]
 AFoldersToConfig = []
 ASubsToConfig = []
 
+def dump(obj):
+   print("#"*30)
+   for attr in dir(obj):
+       if hasattr( obj, attr ):
+           if attr != "__doc__" and attr != "__init__" and attr != "__module__":
+               print("-"*30)
+               print( "obj.%s = %s" % (attr, getattr(obj, attr)))
+               print("-"*30)
+			   
 def SandToProj(Sandbox):
 	current = os.path.dirname(os.path.realpath(__file__))
 	Up1 = os.path.dirname(current)
-	#print(Up1)
-	x = Sandbox.replace(Up1,"/nfs/projekte1/PROJECTS/"+CurrentSandBox.RootProject)
+	pattern = re.compile(re.escape(Up1), re.IGNORECASE)
+	x= re.sub(pattern, "/nfs/projekte1/PROJECTS/"+CurrentSandBox.RootProject,Sandbox)
+	#x = Sandbox.replace(Up1,"/nfs/projekte1/PROJECTS/"+CurrentSandBox.RootProject)
 	return x
 	
 def ConvertALL():
@@ -176,15 +195,7 @@ def GetLabelForRevision(DevPath, SharedProject, Rev):
 			#print(stdout_str)
 			#print(stderr_str)
 		return ret_value
-def dump(obj):
-   print("#"*30)
-   for attr in dir(obj):
-       if hasattr( obj, attr ):
-           if attr != "__doc__" and attr != "__init__" and attr != "__module__":
-               print("-"*30)
-               print( "obj.%s = %s" % (attr, getattr(obj, attr)))
-               print("-"*30)
-			   
+
 def GetSandBoxinfo():
 	cmdline_info = "si sandboxinfo"
 	try:
@@ -231,7 +242,7 @@ def ConfigSub(Sub, CP):
 		print("Subproject: "+ProjectToBeConfigured)
 		#print("Label: "+Label)
 		print("Checkpoint: "+CP)
-		Build_Command="si configuresubproject  --type=build --cpid="+ChangePackage+" --subprojectRevision="+CP+" --project="+RootProjectToBeConfigured +" --devpath="+CurrentSandBox.DevPath +" "+ProjectToBeConfigured
+		Build_Command="si configuresubproject  --type=build --cpid="+ChangePackage+" --subprojectRevision="+CP+" --nocloseCP --project="+RootProjectToBeConfigured +" --devpath="+CurrentSandBox.DevPath +" "+ProjectToBeConfigured
 		ret = proc=subprocess.Popen(Build_Command, shell=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		stdout_str, stderr_str = proc.communicate()
 		if stdout_str :
@@ -268,7 +279,7 @@ def test():
 def main():
 	GetSandBoxinfo()
 	L = CurrentSandBox.LatestLabel
-	if Auto != "STD_ON":
+	if Auto_Sys_Config != "STD_ON":
 		L = getLabel()
 	print("#"*30)
 	print("Label to be configured : "+L)

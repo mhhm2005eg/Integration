@@ -1,10 +1,12 @@
-#import filecmp.py
-
+import os,  stat
+import info
 
 file1="pre_config_shared_projects.xml"
 file2="post_config_shared_projects.xml"
 Outfile = "COMP.txt"
 
+WD =os.path.abspath(info.MyConf.WD)
+os.chdir(WD) 
 
 fi1 = open(file1, "rb")
 lines1 = fi1.readlines()
@@ -30,8 +32,8 @@ if lst:
 	print("Info. : Labels Modified are : "+str(len(lst))+ " Ones")
 	print("Labels Updated as below ... ")
 	for i in lst:
-		fo.write(str(lst.index(i))+" :"+i)
-		print(str(lst.index(i))+" :"+i) 
+		fo.write(str(lst.index(i)+1)+" :"+i)
+		print(str(lst.index(i)+1)+" :"+i) 
 	fo.write("#"*30+" \n")
 	fo.write("#"*30+" \n")
 else:

@@ -8,16 +8,23 @@ from os.path import basename , dirname
 import shutil
 import datetime
 import info
-CP = "263205:1"
-AUTO_CP = "STD_ON"
+CP = info.MyConf.cp
+AUTO_CP = info.MyConf.AUTO_CP
 if AUTO_CP == "STD_ON":
 	CP = info.MyInfo.cp
 
+SEND_CP = "STD_OFF"
+
+
+
 def Configure():
-	Build_Command = "run_config.cmd "
-	proc=subprocess.Popen(Build_Command, shell=False,stdin=subprocess.PIPE,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-	print("CP used is : "+CP)
-	proc.stdin.write(CP+"\n")
+	WD =os.path.abspath(info.MyConf.WD)
+	os.chdir(WD) 
+	Build_Command = "run_config.cmd"
+	proc=subprocess.Popen([Build_Command,"-b"], shell=False,stdin=subprocess.PIPE,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	if SEND_CP == "STD_ON":
+		print("CP used is : "+CP)
+		proc.stdin.write(CP+"\n")
 	proc.stdin.write("2\n")
 	proc.stdin.write("y\n")
 	while True:
@@ -38,8 +45,11 @@ def Configure():
 
 def main():
 	Configure()
+	os.chdir(os.path.dirname(os.path.abspath(__file__)))
 	os.system("Compare.py")
+	os.chdir(os.path.dirname(os.path.abspath(__file__)))
 	os.system("Post_Config.py")
+	os.chdir(os.path.dirname(os.path.abspath(__file__)))
 	os.system("Check_mod.py")
 
 

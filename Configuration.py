@@ -241,16 +241,16 @@ def OrListOfObj(Obj1, Obj2):
 							setattr(x,attr, n )
 	return(Obj1)
 def Test():
-	ret = ReadXml(LatestFolderStrutureFile, "SharedProjectConfig")
+	#ret = ReadXml(LatestFolderStrutureFile, "SharedProjectConfig")
 	#for x in ret:
 		#dump(x)
 	#printSubProj(ret)
-	Filtered = FilterSubproject(ret, CMPList)
-	for x in Filtered:
-		dump(x)
+	#Filtered = FilterSubproject(ret, CMPList)
+	#for x in Filtered:
+		#dump(x)
 	#print(Filtered)
-	#ret = ReadIni("Conf.ini")
-	#print(ret)
+	ret = ReadIni("Conf.ini")
+	print(ret)
 
 def reportLabelsDiff(Objs):
 	ret = 0
@@ -277,5 +277,5 @@ def main():
 		if x.Typ == "build":
 			print(GetRevisionForLabel("DevPath", x.path,x.label))
 		dump(x)
-main()
-#Test()
+#main()
+Test()

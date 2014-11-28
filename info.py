@@ -7,9 +7,11 @@ from os.path import basename , dirname
 #import CppHeaderParser
 import shutil
 import datetime
+import configparser
 
+ConfigFile = "Conf.ini"
 
-
+	
 def dump(obj):
    print("#"*30)
    for attr in dir(obj):
@@ -139,7 +141,7 @@ class UserInfo:
 		Build_Command = "si viewcps --fields=user  "
 		proc=subprocess.Popen(Build_Command, shell=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		stdout_str, stderr_str = proc.communicate()
-		#print(stdout_str)
+		print(stderr_str)
 		Lines = stdout_str.split()
 		x = Lines[2].replace("(","")
 		x = x.replace(")","")
@@ -157,12 +159,45 @@ class UserInfo:
 		#dump(Obj)
 			
 			
-
+class UserConf:
+	def __init__(self, id):
+		self.ID=""
+		self.cp=""
+		self.user = ""
+		self.AUTO_CP = ""
+		self.WD=""
+		self.Rebuild=""
+		self.CLEAN=""
+		self.Auto_Sys_Config=""
+		self.Extra_Build_Options=""
+		self.MainPrj = ""
+		self.InitUserConf()
+	def ReadIni(Obj, IniFileName):
+		returnValue = {}
+		config = configparser.ConfigParser()
+		config.read(IniFileName)
+		SectionList = config.sections()	
+		for section in SectionList:
+			for x in config[section]:
+				returnValue[x] = config[section][x]
+		return (returnValue)
+	def InitUserConf(self):
+		Ret = self.ReadIni(ConfigFile)
+		#print(Ret)
+		self.cp=Ret["change_package".lower()]
+		self.user = Ret["user".lower()]
+		self.AUTO_CP = Ret["AUTO_CP".lower()]
+		self.WD=Ret["WD".lower()]
+		self.Rebuild=Ret["Rebuild".lower()]
+		self.CLEAN=Ret["CLEAN".lower()]
+		self.Auto_Sys_Config=Ret["Auto_Sys_Config".lower()]
+		self.Extra_Build_Options=Ret["Extra_Build_Options".lower()]
+		self.MainPrj = Ret["MainPrj".lower()]						
 
 			 
 CurrentSandBox = Sandbox()
 MyInfo = 	UserInfo(0)
-	
+MyConf = 	UserConf(0)	
 
 	
 #def main():
